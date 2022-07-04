@@ -5,21 +5,27 @@ orbs:
   # Choose either one of the orbs below
   # Declare a dependency on the welcome-orb
   # welcome: circleci/welcome-orb@0.4.1
-  aws-cli: circleci/aws-cli@2.0.3
-jobs:  
-    create_infrastructure: 
-          docker:
-            - image: amazon/aws-cli
-          steps:
-            - checkout
-            - run:
-                name: Create Cloudformation Stack
-                command: |
-                  aws cloudformation deploy \
-                    --template-file template.yml \
-                    --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-                    --region us-west-2 
+    aws-cli: circleci/aws-cli@2.0.3
+jobs:    
+    configure_infrastructure: 
+      docker:
+        - image: python:3.7-alpine3.11
+      steps:
+        - checkout
+        - add_ssh_keys:
+                # You can get this ID in the section where you registered the SSH Key
+                fingerprints: ["3b:c3:e4:04:f2:88:5a:7b:84:2e:25:c1:da:84:3f:0c"] 
+        - run:
+            name: Install Ansible
+            command: |
+              # Install Ansible
+              apk add --update ansible
+        - run:
+            name: Run Playbook and Configure server
+            command: |
+              ansible-playbook -i inventory.txt main4.yml
 workflows:
-  my_workflow:
-      jobs:
-        - create_infrastructure
+  wellcome:
+    jobs:
+      - configure_infrastructure          
+
