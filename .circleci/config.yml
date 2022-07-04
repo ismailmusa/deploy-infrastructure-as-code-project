@@ -19,7 +19,9 @@ jobs:
                   --template-file template.yml \
                   --stack-name myStack \
                   --region us-east-1
-
+          - run:
+              command: |
+                  aws cloudformation describe-stack-events --stack-name myStack     
 workflows:
   my_workflow:
       jobs:
