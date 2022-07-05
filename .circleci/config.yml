@@ -1,31 +1,26 @@
 version: 2.1
 # Use a package of configuration called an orb.
 
-orbs:
-  # Choose either one of the orbs below
-  # Declare a dependency on the welcome-orb
-  # welcome: circleci/welcome-orb@0.4.1
-    aws-cli: circleci/aws-cli@2.0.3
+
 jobs:    
-    configure_infrastructure: 
+    smoke_test:
       docker:
-        - image: python:3.8-alpine3.11
+        - image: alpine:latest
       steps:
-        - checkout
-        - add_ssh_keys:
-                # You can get this ID in the section where you registered the SSH Key
-                fingerprints: ["3b:c3:e4:04:f2:88:5a:7b:84:2e:25:c1:da:84:3f:0c"] 
+        - run: apk add --update curl
         - run:
-            name: Install Ansible
+            name: smoke test
             command: |
-              # Install Ansible
-              apk add --update ansible
-        - run:
-            name: Run Playbook and Configure server
-            command: |
-              ansible-playbook -i inventory.txt main4.yml
+              URL="https://blog.udacity.com/"
+              # Test if website exists
+              if curl -s --head ${URL} 
+              then
+                echo "it worked"
+              else
+                echo "it failed "
+              fi
 workflows:
   wellcome:
     jobs:
-      - configure_infrastructure          
+      - smoke_test         
 
